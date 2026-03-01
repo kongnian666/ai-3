@@ -1,38 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { BottomNav } from '@/components/BottomNav';
-import { GoogleGenAI } from "@google/genai";
-import ReactMarkdown from 'react-markdown';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
-  const [showAIModal, setShowAIModal] = useState(false);
-  const [aiAnalysis, setAiAnalysis] = useState('');
-  const [analyzing, setAnalyzing] = useState(false);
-
-  const handleAIAnalyze = async () => {
-    setAnalyzing(true);
-    setShowAIModal(true);
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `Analyze the recent teaching trends based on these exam papers:
-        1. "2024 Grade 9 Math Midterm" (25 questions, difficulty: Medium)
-        2. "Calculus Test 1" (10 questions, difficulty: Hard)
-        3. "Algebra Basics Final" (40 questions, difficulty: Easy)
-        
-        Provide a brief, encouraging summary for the teacher in Simplified Chinese. Suggest 2 focus areas for next week.`,
-      });
-      setAiAnalysis(response.text || '分析失败，请稍后重试。');
-    } catch (e) {
-      setAiAnalysis('AI 服务暂时不可用。');
-    } finally {
-      setAnalyzing(false);
-    }
-  };
 
   return (
     <Layout>
@@ -50,48 +21,11 @@ export default function TeacherDashboard() {
             <h2 className="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">阿里斯老师</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button 
-              onClick={handleAIAnalyze}
-              className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-              title="AI 教学分析"
-            >
-              <span className="material-symbols-outlined">auto_awesome</span>
-            </button>
             <button className="flex size-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
               <span className="material-symbols-outlined">notifications</span>
             </button>
           </div>
         </div>
-
-        {/* AI Analysis Modal */}
-        {showAIModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowAIModal(false)}>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-slate-100 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center gap-2 mb-4 text-primary">
-                <span className="material-symbols-outlined">auto_awesome</span>
-                <h3 className="text-lg font-bold">AI 教学周报</h3>
-              </div>
-              
-              {analyzing ? (
-                <div className="flex flex-col items-center py-8 gap-3">
-                  <div className="size-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm text-slate-500">正在分析最近的试卷数据...</p>
-                </div>
-              ) : (
-                <div className="prose dark:prose-invert text-sm max-h-[60vh] overflow-y-auto">
-                  <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
-                </div>
-              )}
-              
-              <button 
-                onClick={() => setShowAIModal(false)}
-                className="mt-6 w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              >
-                关闭
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Search Bar */}
         <div className="px-4 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
